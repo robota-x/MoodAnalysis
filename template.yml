@@ -9,6 +9,15 @@ Parameters:
     Description: CodeStar projectId used to associate new resources to team members
 
 Resources:
+  SecretStore:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: newsAPI
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
   HelloWorld:
     Type: AWS::Serverless::Function
     Properties:
@@ -17,6 +26,10 @@ Resources:
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref VotesTable
       Events:
         GetEvent:
           Type: Api
